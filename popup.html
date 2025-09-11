@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contextual Q&A AI</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div id="loadingSection" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Analyzing content...</p>
+    </div>
+
+    <div id="resultSection" class="hidden">
+      <div id="websiteInfo" class="website-info"></div>
+      <div id="result" class="result"></div>
+      <button id="configureBtn">Configure Questions & Target</button>
+    </div>
+
+    <div id="configSection" class="hidden">
+      <div id="websiteInfo2" class="website-info"></div>
+      
+      <div class="config-section">
+        <h4>Target Element Selector</h4>
+        <input type="text" id="targetSelector" placeholder="CSS or XPath selector (e.g., .content, #main, //div[@id='content'])" />
+        <small class="small-text">
+          CSS selector or XPath for the element to analyze. Leave empty to use selected text or auto-detection.
+        </small>
+      </div>
+
+      <div class="config-section">
+        <h4>Questions</h4>
+        <input type="text" id="newQuestion" placeholder="Add a question and press Enter" />
+        <button id="addQuestionBtn">Add Question</button>
+        <div id="questionsList"></div>
+      </div>
+
+      <div class="button-group">
+        <button id="analyzeBtn" disabled>Analyze Now</button>
+        <button id="cancelBtn">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Load utility modules first -->
+    <script src="config.js"></script>
+    <script src="api-service.js"></script>
+    <script src="storage-utils.js"></script>
+    <script src="content-extractor.js"></script>
+    <script src="ui-utils.js"></script>
+    
+    <!-- Load main application last -->
+    <script src="popup.js"></script>
+  </body>
+</html>

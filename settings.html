@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contextual Q&A AI - Settings</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="settings-page">
+    <div class="container">
+        <h1>Contextual Q&A AI Settings</h1>
+
+        <div id="status" class="status hidden"></div>
+
+        <div class="section">
+            <h2>API Configuration</h2>
+            <div class="form-group">
+                <label for="apiUrl">Ollama API URL</label>
+                <input type="url" id="apiUrl" placeholder="http://localhost:11434/api/generate">
+                <div class="help-text">URL of your Ollama API endpoint</div>
+            </div>
+            <div class="form-group">
+                <label for="modelName">Model Name</label>
+                <input type="text" id="modelName" placeholder="mistral">
+                <div class="help-text">Name of the model to use (e.g., mistral, llama2, codellama)</div>
+            </div>
+            <div class="form-group">
+                <label for="timeout">Request Timeout (seconds)</label>
+                <input type="number" id="timeout" min="5" max="300" placeholder="30">
+                <div class="help-text">Maximum time to wait for API responses</div>
+            </div>
+            <button id="testConnection">Test Connection</button>
+            <button id="saveApiConfig" class="secondary">Save Configuration</button>
+        </div>
+
+        <div class="section">
+            <h2>Website Configurations</h2>
+            <div class="help-text help-text-section">
+                Manage questions and target selectors for different websites
+            </div>
+            <div id="websiteList" class="website-list">
+                <div class="loading-placeholder">
+                    Loading website configurations...
+                </div>
+            </div>
+            <button id="exportConfigs" class="secondary">Export All</button>
+            <button id="importConfigs" class="secondary">Import</button>
+            <button id="clearAllConfigs" class="danger">Clear All</button>
+        </div>
+
+        <div class="section">
+            <h2>Storage Information</h2>
+            <div id="storageInfo">
+                <div class="loading-placeholder">
+                    Loading storage information...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load utility modules -->
+    <script src="config.js"></script>
+    <script src="storage-utils.js"></script>
+    
+    <!-- Settings page script -->
+    <script>
+        class SettingsApp {
+            constructor() {
+                this.config = null;
+                this.storageUtils = null;
+                this.statusEl = document.getElementById('status');
+            }
+
+            async init() {
+                // Initialize services
+                this.config = window.Config;
+                await this.config.load();
+                this.storageUtils = new window.StorageUtils(this.config);
+
+                // Load current settings
+                await this.loadSettings();
+                await this.loadWebsiteConfigs();
+                await this.loadStorageInfo();
+
+                // Setup event listeners
+                this.setupEventListeners();
+            }
+
+            async loadSettings() {
+                document.getElementById('apiUrl').value = this.config.getApiUrl();
+                document.getElementById('modelName').value = this.config.getModelName();
+                document.getElementById('timeout').value = this.config.getRequestTimeout() / 1000;
+            }
+
+            setupEventListeners() {
+                document.getElementById('testConnection').addEventListener('click', () => this.testConnection());
+                document.getElementById('saveApiConfig').addEventListener('click', () => this.saveApiConfig());
+                document.getElementById('exportConfigs').addEventListener('click', () => this.exportConfigs());
+                document.getElementById('importConfigs').addEventListener('click', () => this.importConfigs());
+                document.getElementById('clearAllConfigs').addEventListener('click', () => this.clearAllConfigs());
+            }
+
+            showStatus(message, type = 'info') {
+                this.statusEl.textContent = message;
+                this.statusEl.className = `status ${type}`;
+                this.statusEl.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    this.statusEl.classList.add('hidden');
+                }, 5000);
+            }
+
+            async testConnection() {
+                try {
+                    this.showStatus('Testing connection...', 'info');
+                    
+                    const response = await new Promise((resolve, reject) => {
+                        chrome.runtime.sendMessage({
+                            action: "testConnection"
+                        }, (response) => {
+                            if (chrome.runtime.lastError) {
+                                reject(new Error(chrome.runtime.lastError.message));
+                            } else if (response && response.success) {
+                                resolve(response);
+                            } else {
+                                reject(new Error(response?.error || 'Connection failed'));
+                            }
+                        });
+                    });
+
+                    this.showStatus('Connection successful!', 'success');
+                } catch (error) {
+                    this.showStatus(`Connection failed: ${error.message}`, 'error');
+                }
+            }
+
+            async saveApiConfig() {
+                try {
+                    const apiUrl = document.getElementById('apiUrl').value.trim();
+                    const modelName = document.getElementById('modelName').value.trim();
+                    const timeout = parseInt(document.getElementById('timeout').value) * 1000;
+
+                    if (!apiUrl || !modelName || !timeout) {
+                        this.showStatus('Please fill in all fields', 'error');
+                        return;
+                    }
+
+                    await this.config.set('OLLAMA_API_URL', apiUrl);
+                    await this.config.set('MODEL_NAME', modelName);
+                    await this.config.set('REQUEST_TIMEOUT', timeout);
+
+                    this.showStatus('Configuration saved successfully!', 'success');
+                } catch (error) {
+                    this.showStatus(`Failed to save configuration: ${error.message}`, 'error');
+                }
+            }
+
+            async loadWebsiteConfigs() {
+                try {
+                    const configs = await this.storageUtils.getAllWebsiteConfigs();
+                    const listEl = document.getElementById('websiteList');
+                    
+                    if (Object.keys(configs).length === 0) {
+                        listEl.innerHTML = '<div class="loading-placeholder">No website configurations found</div>';
+                        return;
+                    }
+
+                    listEl.innerHTML = '';
+                    Object.entries(configs).forEach(([origin, config]) => {
+                        const item = document.createElement('div');
+                        item.className = 'website-item';
+                        item.innerHTML = `
+                            <div class="website-info">
+                                <div class="website-origin">${origin}</div>
+                                <div class="website-stats">
+                                    ${config.questions?.length || 0} questions, 
+                                    Target: ${config.targetSelector || 'None'}
+                                </div>
+                            </div>
+                            <button onclick="settingsApp.deleteWebsiteConfig('${origin}')" class="danger small-delete-btn">Delete</button>
+                        `;
+                        listEl.appendChild(item);
+                    });
+                } catch (error) {
+                    console.error('Failed to load website configs:', error);
+                }
+            }
+
+            async deleteWebsiteConfig(origin) {
+                if (confirm(`Delete configuration for ${origin}?`)) {
+                    try {
+                        await this.storageUtils.deleteWebsiteConfig(origin);
+                        await this.loadWebsiteConfigs();
+                        this.showStatus('Configuration deleted', 'success');
+                    } catch (error) {
+                        this.showStatus(`Failed to delete configuration: ${error.message}`, 'error');
+                    }
+                }
+            }
+
+            async loadStorageInfo() {
+                try {
+                    const info = await this.storageUtils.getStorageInfo();
+                    const infoEl = document.getElementById('storageInfo');
+                    
+                    if (info) {
+                        infoEl.innerHTML = `
+                            <div>Storage Used: ${info.used} / ${info.total} bytes (${info.percentUsed}%)</div>
+                            <div>Available: ${info.available} bytes</div>
+                        `;
+                    } else {
+                        infoEl.innerHTML = '<div class="muted-text">Storage information unavailable</div>';
+                    }
+                } catch (error) {
+                    console.error('Failed to load storage info:', error);
+                }
+            }
+
+            async exportConfigs() {
+                try {
+                    const configs = await this.storageUtils.getAllWebsiteConfigs();
+                    const dataStr = JSON.stringify(configs, null, 2);
+                    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                    
+                    const url = URL.createObjectURL(dataBlob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'contextual-qa-configs.json';
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    
+                    this.showStatus('Configurations exported successfully!', 'success');
+                } catch (error) {
+                    this.showStatus(`Export failed: ${error.message}`, 'error');
+                }
+            }
+
+            async importConfigs() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = async (e) => {
+                    try {
+                        const file = e.target.files[0];
+                        const text = await file.text();
+                        const configs = JSON.parse(text);
+                        
+                        for (const [origin, config] of Object.entries(configs)) {
+                            await this.storageUtils.saveWebsiteConfig(origin, config);
+                        }
+                        
+                        await this.loadWebsiteConfigs();
+                        this.showStatus('Configurations imported successfully!', 'success');
+                    } catch (error) {
+                        this.showStatus(`Import failed: ${error.message}`, 'error');
+                    }
+                };
+                input.click();
+            }
+
+            async clearAllConfigs() {
+                if (confirm('Delete ALL website configurations? This cannot be undone.')) {
+                    try {
+                        const configs = await this.storageUtils.getAllWebsiteConfigs();
+                        for (const origin of Object.keys(configs)) {
+                            await this.storageUtils.deleteWebsiteConfig(origin);
+                        }
+                        await this.loadWebsiteConfigs();
+                        this.showStatus('All configurations cleared', 'success');
+                    } catch (error) {
+                        this.showStatus(`Failed to clear configurations: ${error.message}`, 'error');
+                    }
+                }
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            window.settingsApp = new SettingsApp();
+            await window.settingsApp.init();
+        });
+    </script>
+</body>
+</html>
