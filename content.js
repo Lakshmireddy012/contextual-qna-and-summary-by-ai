@@ -180,12 +180,19 @@ function showContextualModal(selectedText) {
           </div>
           <div class="result-section" style="display: none;">
             <div class="response-header">
-              <label>AI Response:</label>
-              <button class="copy-response-btn" title="Copy to clipboard">
+              <label>Q&A History:</label>
+              <div class="actions">
+                <button class="copy-response-btn" title="Copy all to clipboard">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
                 </svg>
               </button>
+                <button class="clear-history-btn" title="Clear all Q&A history" style="margin-left: 8px; background: #6c757d;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                  </svg>
+                </button>
+              </div>
             </div>
             <div class="ai-response"></div>
           </div>
@@ -198,186 +205,254 @@ function showContextualModal(selectedText) {
   const style = document.createElement('style');
   style.textContent = `
     .contextual-ai-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background: rgba(0, 0, 0, 0.7) !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      z-index: 10000 !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     }
     
     .contextual-ai-modal {
-      background: white;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      background: white !important;
+      border-radius: 12px !important;
+      width: 90% !important;
+      max-width: 600px !important;
+      max-height: 80vh !important;
+      overflow-y: auto !important;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
     }
     
     .contextual-ai-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-      border-bottom: 1px solid #e1e5e9;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 20px !important;
+      border-bottom: 1px solid #e1e5e9 !important;
     }
     
     .contextual-ai-header h3 {
-      margin: 0;
-      color: #1a1a1a;
-      font-size: 18px;
-      font-weight: 600;
+      margin: 0 !important;
+      color: #1a1a1a !important;
+      font-size: 18px !important;
+      font-weight: 600 !important;
     }
     
     .contextual-ai-close {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #666;
-      padding: 0;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
+      background: none !important;
+      border: none !important;
+      font-size: 24px !important;
+      cursor: pointer !important;
+      color: #666 !important;
+      padding: 0 !important;
+      width: 30px !important;
+      height: 30px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 6px !important;
     }
     
     .contextual-ai-close:hover {
-      background: #f0f0f0;
-      color: #333;
+      background: #f0f0f0 !important;
+      color: #333 !important;
     }
     
     .contextual-ai-content {
-      padding: 20px;
+      padding: 20px !important;
     }
     
     .selected-text-section, .question-section, .result-section {
-      margin-bottom: 20px;
+      margin-bottom: 20px !important;
     }
     
     .contextual-ai-content label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #333;
-      font-size: 14px;
+      display: block !important;
+      margin-bottom: 8px !important;
+      font-weight: 600 !important;
+      color: #333 !important;
+      font-size: 14px !important;
     }
     
     .response-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      margin-bottom: 12px !important;
     }
     
     .response-header label {
-      margin-bottom: 0;
+      margin-bottom: 0 !important;
     }
     
     .selected-text-display {
-      background: #f8f9fa;
-      border: 1px solid #e1e5e9;
-      border-radius: 6px;
-      padding: 12px;
-      max-height: 120px;
-      overflow-y: auto;
-      font-size: 14px;
-      line-height: 1.5;
-      color: #333;
+      background: #f8f9fa !important;
+      border: 1px solid #e1e5e9 !important;
+      border-radius: 6px !important;
+      padding: 12px !important;
+      max-height: 120px !important;
+      overflow-y: auto !important;
+      font-size: 14px !important;
+      line-height: 1.5 !important;
+      color: #333 !important;
     }
     
     .input-container {
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
+      position: relative !important;
+      display: flex !important;
+      align-items: flex-end !important;
+      gap: 8px !important;
     }
     
     .question-input {
-      flex: 1;
-      border: 1px solid #e1e5e9;
-      border-radius: 6px;
-      padding: 12px;
-      font-size: 14px;
-      resize: vertical;
-      font-family: inherit;
-      box-sizing: border-box;
-      min-height: 80px;
+      flex: 1 !important;
+      border: 1px solid #e1e5e9 !important;
+      border-radius: 6px !important;
+      padding: 12px !important;
+      font-size: 14px !important;
+      resize: vertical !important;
+      font-family: inherit !important;
+      box-sizing: border-box !important;
+      min-height: 80px !important;
     }
     
     .question-input:focus {
-      outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+      outline: none !important;
+      border-color: #007bff !important;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25) !important;
     }
     
     .send-btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 40px;
-      height: 40px;
-      flex-shrink: 0;
+      background: #007bff !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 10px !important;
+      cursor: pointer !important;
+      transition: all 0.2s !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-width: 40px !important;
+      height: 40px !important;
+      flex-shrink: 0 !important;
     }
     
     .send-btn:enabled:hover {
-      background: #0056b3;
-      transform: translateY(-1px);
+      background: #0056b3 !important;
+      transform: translateY(-1px) !important;
     }
     
     .send-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      transform: none;
+      background: #ccc !important;
+      cursor: not-allowed !important;
+      transform: none !important;
     }
     
     .ai-response {
-      background: #f8f9fa;
-      border: 1px solid #e1e5e9;
-      border-radius: 6px;
-      padding: 15px;
-      max-height: 300px;
-      overflow-y: auto;
-      font-size: 14px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-wrap: break-word;
+      background: #f8f9fa !important;
+      border: 1px solid #e1e5e9 !important;
+      border-radius: 6px !important;
+      padding: 15px !important;
+      max-height: 300px !important;
+      overflow-y: auto !important;
+      font-size: 14px !important;
+      line-height: 1.6 !important;
+      word-wrap: break-word !important;
     }
     
-    .copy-response-btn {
-      background: #6c757d;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
+    .copy-response-btn, .clear-history-btn {
+      background: #6c757d !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 4px !important;
+      padding: 8px !important;
+      cursor: pointer !important;
+      transition: all 0.2s !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 32px !important;
+      height: 32px !important;
+    }
+
+    .actions {
+      display: flex !important;
     }
     
     .copy-response-btn:hover {
-      background: #5a6268;
-      transform: translateY(-1px);
+      background: #5a6268 !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Q&A History Styles */
+    .qa-history {
+      max-height: 400px !important;
+      overflow-y: auto !important;
+    }
+
+    .qa-item {
+      margin-bottom: 12px !important;
+    }
+
+    .qa-question {
+      font-weight: 600 !important;
+      color: #2c3e50 !important;
+      margin-bottom: 6px !important;
+      line-height: 1.3 !important;
+      font-size: 14px !important;
+    }
+
+    .qa-answer-card {
+      border: 1px solid #e1e5e9 !important;
+      border-radius: 6px !important;
+      background: #f8f9fa !important;
+      padding: 8px !important;
+      position: relative !important;
+    }
+
+    .qa-answer-card.qa-error {
+      border-color: #dc3545 !important;
+      background: #f8d7da !important;
+    }
+
+    .qa-answer-content {
+      color: #27ae60 !important;
+      line-height: 1.4 !important;
+      font-size: 13px !important;
+      margin-bottom: 6px !important;
+      padding-right: 35px !important;
+      text-align: justify !important;
+    }
+
+    .qa-actions {
+      position: absolute !important;
+      top: 6px !important;
+      right: 6px !important;
+    }
+
+    .qa-copy {
+      background: #6c757d !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 3px !important;
+      padding: 4px !important;
+      cursor: pointer !important;
+      transition: background 0.2s !important;
+      width: 24px !important;
+      height: 24px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .qa-copy:hover {
+      background: #5a6268 !important;
     }
   `;
   
@@ -396,6 +471,7 @@ function setupModalEventListeners(modal, selectedText) {
   const resultSection = modal.querySelector('.result-section');
   const aiResponse = modal.querySelector('.ai-response');
   const copyBtn = modal.querySelector('.copy-response-btn');
+  const clearBtn = modal.querySelector('.clear-history-btn');
 
   // Close modal handlers
   closeBtn.addEventListener('click', () => modal.remove());
@@ -413,15 +489,166 @@ function setupModalEventListeners(modal, selectedText) {
     if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
       e.preventDefault();
       if (!sendBtn.disabled) {
-        analyzeText();
+        analyzeTextWithHistory();
       }
     }
   });
 
   // Handle send button click
-  sendBtn.addEventListener('click', analyzeText);
+  sendBtn.addEventListener('click', analyzeTextWithHistory);
 
-  // Analyze function
+  // Q&A History storage
+  let qaHistory = [];
+
+  // Analyze function with Q&A history
+  async function analyzeTextWithHistory() {
+    const question = questionInput.value.trim();
+    if (!question) return;
+
+    // Clear input immediately for better UX
+    questionInput.value = '';
+
+    // Show loading state
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2"><animate attributeName="r" values="2;4;2" dur="1s" repeatCount="indefinite"/></circle></svg>';
+    questionInput.placeholder = 'Processing your question...';
+    
+    const prompt = `Analyze the following text and answer the question.
+
+Text:
+[${selectedText}]
+
+Question:
+${question}
+
+Please provide a clear and concise answer:`;
+
+    try {
+      const response = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({
+          action: "analyzeWithLLM",
+          prompt: prompt,
+          timeout: 30000 // 30 second timeout
+        }, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message));
+          } else if (response && response.success) {
+            resolve(response.response);
+          } else {
+            reject(new Error(response?.error || 'Unknown error occurred'));
+          }
+        });
+      });
+
+      // Add to Q&A history (most recent first)
+      const qaEntry = {
+        question: question,
+        answer: response,
+        timestamp: new Date().toLocaleTimeString(),
+        id: Date.now()
+      };
+      qaHistory.unshift(qaEntry); // Add to beginning
+
+      // Display updated Q&A history
+      displayQAHistory();
+
+    } catch (error) {
+      // Add error to history
+      const qaEntry = {
+        question: question,
+        answer: `❌ Error: ${error.message}`,
+        timestamp: new Date().toLocaleTimeString(),
+        id: Date.now(),
+        isError: true
+      };
+      qaHistory.unshift(qaEntry);
+      displayQAHistory();
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
+      questionInput.placeholder = 'Enter your question here (Press Enter or click send)...';
+    }
+  }
+
+  // Display Q&A history
+  function displayQAHistory() {
+    if (qaHistory.length === 0) {
+      resultSection.style.display = 'none';
+      return;
+    }
+
+    let historyHTML = '<div class="qa-history">';
+    
+    qaHistory.forEach((qa, index) => {
+      const isError = qa.isError || false;
+      const errorClass = isError ? 'qa-error' : '';
+      
+      historyHTML += `
+        <div class="qa-item">
+          <div class="qa-question">
+            ${escapeHtml(qa.question)}
+          </div>
+          <div class="qa-answer-card ${errorClass}">
+            <div class="qa-answer-content">
+              ${escapeHtml(qa.answer)}
+            </div>
+            <div class="qa-actions">
+              <button class="qa-copy" data-qa-id="${qa.id}" title="Copy answer">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    
+    historyHTML += '</div>';
+    
+    aiResponse.innerHTML = historyHTML;
+    resultSection.style.display = 'block';
+    
+    // Add event listeners for copy buttons using event delegation
+    aiResponse.addEventListener('click', async (e) => {
+      if (e.target.closest('.qa-copy')) {
+        const copyBtn = e.target.closest('.qa-copy');
+        const qaId = parseInt(copyBtn.getAttribute('data-qa-id'));
+        await copyQAAnswer(qaId);
+      }
+    });
+  }
+
+
+  // Copy individual Q&A answer
+  async function copyQAAnswer(id) {
+    const qa = qaHistory.find(qa => qa.id === id);
+    
+    if (!qa) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(qa.answer);
+      
+      // Visual feedback
+      const copyBtn = document.querySelector(`[data-qa-id="${id}"]`);
+      
+      if (copyBtn) {
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+        copyBtn.style.background = '#28a745';
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHTML;
+          copyBtn.style.background = '#6c757d';
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Failed to copy answer:', error);
+    }
+  }
+
+  // Analyze function (original - kept for compatibility)
   async function analyzeText() {
     const question = questionInput.value.trim();
     if (!question) return;
@@ -470,7 +697,14 @@ Please provide a clear and concise answer:`;
   // Handle copy to clipboard
   copyBtn.addEventListener('click', async () => {
     try {
-      await navigator.clipboard.writeText(aiResponse.textContent);
+      // Copy all Q&A history as formatted text
+      let copyText = 'Q&A History:\n\n';
+      qaHistory.forEach((qa, index) => {
+        copyText += `${index + 1}. ${qa.question}\n`;
+        copyText += `${qa.answer}\n\n`;
+      });
+      
+      await navigator.clipboard.writeText(copyText);
       const originalHTML = copyBtn.innerHTML;
       copyBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
       copyBtn.style.background = '#28a745';
@@ -485,6 +719,14 @@ Please provide a clear and concise answer:`;
         copyBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
         copyBtn.style.background = '#6c757d';
       }, 2000);
+    }
+  });
+
+  // Handle clear history
+  clearBtn.addEventListener('click', () => {
+    if (qaHistory.length > 0 && confirm('Clear all Q&A history?')) {
+      qaHistory = [];
+      displayQAHistory();
     }
   });
 
