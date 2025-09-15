@@ -2,6 +2,20 @@
 
 A powerful Chrome extension that analyzes web content using local AI models and provides contextual answers to your questions. Built with privacy in mind, this extension runs entirely on your local machine using Ollama, ensuring your data never leaves your computer.
 
+## From Context menu on a selected Text
+
+![ScreenRecording2025-09-15at4 06 30PM mov-ezgif com-optimize](https://github.com/user-attachments/assets/179058fd-54f2-4cc7-9ee3-7378a9868f25)
+
+## From Extensions Pane, Once questions 
+Initially, you need to configure the questions and the target element. Once configured, the same questions will automatically be processed by the AI. You can modify them anytime if you want to make changes.
+
+![ScreenRecording2025-09-15at4 24 08PM mov-ezgif com-optimize](https://github.com/user-attachments/assets/cb5a8cf0-6135-49d0-ad47-4e39dff836cb)
+
+## Settings for LLM Configuration
+<img width="657" height="534" alt="image" src="https://github.com/user-attachments/assets/e687f4a0-a7f2-4111-9ab0-2c9a8f1087dd" />
+
+
+
 ## 🌟 Key Advantages
 
 ### 🔒 **Privacy First**
@@ -161,38 +175,21 @@ For more detailed information about configuring CORS for Ollama, including secur
 
 ## ⚙️ Configuration
 
-### First-Time Setup
-
-1. **Click the Extension Icon**
-   - The extension will detect it's your first time
-   - You'll see a welcome screen with setup options
-
-2. **Choose Setup Method**
-   - **Manual**: Click "Open Settings" to configure manually
-   - **Auto**: Click "Auto-Open Settings" to save preference and auto-redirect
-
-3. **Configure API Settings**
-   - **Ollama API URL**: `http://localhost:11434/api/generate` (default)
-   - **Model Name**: `mistral` (or your preferred model)
-   - **Timeout**: `30` seconds (adjust based on your hardware)
-
-4. **Test Connection**
-   - Click "Test Connection" to verify Ollama is working
-   - You should see "Connection successful!"
-
 ### Website-Specific Configuration
 
 For each website you want to analyze:
 
 1. **Navigate to the Website**
-2. **Click the Extension Icon**
-3. **Add Questions**
+2. **Extension Setting Link **
+   - chrome-extension://[id]/settings.html
+4. **Click the Extension Icon**
+5. **Add Questions**
    - Enter questions you want to ask about the content
    - Examples: "What are the key requirements?", "What is the salary range?", "What skills are needed?"
-4. **Set Target Selector (Optional)**
+6. **Set Target Selector **
    - CSS selector for specific content (e.g., `.job-description`, `article`, `main`)
-   - Leave empty to use selected text or auto-detection
-5. **Click "Analyze Now"**
+   - Leave empty to use selected text
+7. **Click "Analyze Now"**
 
 ## 📖 How to Use
 
