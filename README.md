@@ -2,6 +2,16 @@
 
 A powerful Chrome extension that analyzes web content using local AI models and provides contextual answers to your questions. Built with privacy in mind, this extension runs entirely on your local machine using Ollama, ensuring your data never leaves your computer.
 
+## 🎯 Use Cases
+
+- **Job Applications**: Analyze job descriptions with custom questions
+- **Research**: Extract key information from articles and papers
+- **Content Analysis**: Understand complex documents quickly
+- **Learning**: Ask questions about educational content
+- **Code Review**: Analyze code snippets and documentation
+- **News Analysis**: Get insights from news articles
+- **Product Research**: Analyze product descriptions and reviews
+
 ## From Context menu on a selected Text
 
 ![ScreenRecording2025-09-15at4 06 30PM mov-ezgif com-optimize](https://github.com/user-attachments/assets/179058fd-54f2-4cc7-9ee3-7378a9868f25)
@@ -39,16 +49,6 @@ Initially, you need to configure the questions and the target element. Once conf
 - **Modular Architecture**: Clean, maintainable codebase
 - **Configurable**: Easy to customize and extend
 - **Open Source**: Full transparency and community contributions
-
-## 🎯 Use Cases
-
-- **Job Applications**: Analyze job descriptions with custom questions
-- **Research**: Extract key information from articles and papers
-- **Content Analysis**: Understand complex documents quickly
-- **Learning**: Ask questions about educational content
-- **Code Review**: Analyze code snippets and documentation
-- **News Analysis**: Get insights from news articles
-- **Product Research**: Analyze product descriptions and reviews
 
 ## 📋 Prerequisites
 
